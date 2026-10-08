@@ -1,0 +1,29 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+const dir=fileURLToPath(new URL('../dist/',import.meta.url));
+const source=readFileSync(dir+'workshop-script.md','utf8');
+const escape=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inline=s=>escape(s).replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,'<a href="$2">$1</a>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+let out=[], nav=[], paragraph=[], list=[], quote=[], rows=[], listType='ul';
+function flush(){
+ if(paragraph.length){out.push('<p>'+paragraph.map(s=>inline(s.trimEnd())+(s.endsWith('  ')?'<br>':'')).join(' ')+'</p>');paragraph=[];}
+ if(list.length){out.push('<'+listType+'>'+list.map(s=>'<li>'+inline(s)+'</li>').join('')+'</'+listType+'>');list=[];}
+ if(quote.length){out.push('<blockquote><span class="say">SAY</span>'+quote.map(s=>s?inline(s):'<br><br>').join(' ')+'</blockquote>');quote=[];}
+ if(rows.length){out.push('<div class="table-wrap"><table><thead><tr>'+rows[0].map(s=>'<th>'+inline(s)+'</th>').join('')+'</tr></thead><tbody>'+rows.slice(1).map(row=>'<tr>'+row.map(s=>'<td>'+inline(s)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>');rows=[];}
+}
+for(const line of source.split('\n')){
+ if(line.startsWith('>')){if(paragraph.length||list.length||rows.length)flush();quote.push(line.replace(/^> ?/,''));continue;}
+ if(line.startsWith('|')){if(paragraph.length||list.length||quote.length)flush();if(!/^\|[\s:|-]+\|$/.test(line))rows.push(line.slice(1,-1).split('|').map(s=>s.trim()));continue;}
+ const item=line.match(/^(- |\d+\. )(.*)$/);
+ if(item){const kind=item[1]==='- '?'ul':'ol';if(paragraph.length||quote.length||rows.length||(list.length&&listType!==kind))flush();listType=kind;list.push(item[2]);continue;}
+ const heading=line.match(/^(#{1,3}) (.+)$/);
+ if(heading){flush();const level=heading[1].length,id=heading[2].toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-$/,'');out.push(`<h${level} id="${id}">${inline(heading[2])}</h${level}>`);if(level===2)nav.push(`<a href="#${id}">${inline(heading[2])}</a>`);continue;}
+ if(!line.trim()){flush();continue;}
+ if(list.length||quote.length||rows.length)flush();paragraph.push(line);
+}
+flush();
+const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Workshop script · Denisa Cakoni</title><style>
+:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;color:#202624;background:#f4f3ef;font:17px/1.65 system-ui,sans-serif}header{position:sticky;top:0;z-index:2;background:#17221d;color:#f4f3ef;display:flex;gap:18px;align-items:center;justify-content:space-between;padding:15px 5%;font-size:14px}header a{color:#e9bd95;text-decoration:none}header div{display:flex;gap:15px;align-items:center}button{border:1px solid #8b9d91;color:white;background:transparent;border-radius:5px;padding:8px 15px;font:inherit;cursor:pointer}.shell{display:grid;grid-template-columns:235px minmax(0,850px);gap:50px;max-width:1270px;margin:auto;padding:40px 30px 90px}aside{position:sticky;top:95px;align-self:start;max-height:80vh;overflow:auto}aside small{font-weight:700;letter-spacing:.12em;color:#56645b}aside a{display:block;margin:10px 0;font-size:13px;line-height:1.5;color:#354a3e;text-decoration:none}aside a:hover{text-decoration:underline}article{min-width:0}h1{font-size:42px;line-height:1.15;letter-spacing:-.03em;margin:0 0 24px}h2{font-size:29px;line-height:1.25;margin:55px 0 18px;scroll-margin-top:100px}h3{font-size:21px;margin:32px 0 14px}p{margin:14px 0}a{color:#2b6350;text-underline-offset:3px}blockquote{margin:20px 0;padding:22px 27px;background:white;border-left:4px solid #b27240;font-size:18px;line-height:1.7}.say{display:block;font-size:10px;letter-spacing:.18em;color:#905525;font-weight:800;margin-bottom:8px}ul,ol{padding-left:23px}li{padding-left:5px;margin:10px 0}code{font-size:.88em;background:#e7e9e3;padding:2px 5px;border-radius:3px;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;font-size:14px;line-height:1.5}th,td{padding:12px;border:1px solid #d1d8d2;text-align:left}th{background:#e1e8e1}td{background:#fff}.table-wrap{overflow:auto;margin:24px 0}.footer{margin-top:60px;font-size:13px;color:#56645b}a:focus-visible,button:focus-visible{outline:3px solid #bd7c44;outline-offset:4px}@media(max-width:850px){.shell{display:block;padding:26px 6%}aside{position:static;max-height:none;padding-bottom:20px;margin-bottom:30px;border-bottom:1px solid #ccd4cd}aside a{display:inline-block;margin:5px 12px 5px 0}h1{font-size:35px}header{flex-wrap:wrap}h2{font-size:25px}blockquote{padding:20px}}@media print{header,aside{display:none}.shell{display:block;margin:0;padding:0}body{background:white;color:black;font:11pt/1.45 sans-serif}h1{font-size:26pt}h2{font-size:18pt;margin-top:25pt;break-after:avoid}h3{font-size:13pt;break-after:avoid}blockquote{font-size:11pt;padding:10pt 16pt;border-color:#888;break-inside:avoid}table{font-size:10pt}tr{break-inside:avoid}a{color:inherit}p,li{orphans:3;widows:3}@page{size:letter;margin:.7in}}
+</style><script defer src="./script-controls.js"></script></head><body><header><a href="./#console">← Presenter console</a><div><a href="./workshop-script.md" download>Download editable script</a><button id="print-script">Print / Save PDF</button></div></header><div class="shell"><aside aria-label="Script contents"><small>YOUR RUN OF SHOW</small>${nav.join('')}</aside><article>${out.join('\n')}<p class="footer">Prepared for Denisa Cakoni · October 9, 2026 · Rehearsal edition updated October 8</p></article></div></body></html>`;
+writeFileSync(dir+'script.html',html);
+console.log('Built static workshop script with '+nav.length+' sections.');

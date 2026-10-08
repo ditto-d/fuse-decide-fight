@@ -6,15 +6,17 @@ Interactive synthetic Mars workshop for Denisa Cakoni.
 
 - Open `#play` for participants. The shared challenge is MSN-2047. Practice is a separate map.
 - Open `#console` for the presenter. Use the five stage buttons or left/right arrows.
-- Fuse: ask for a prediction, scan, then reveal the ground truth.
-- Decide: train from a blank table. The 8 checkpoints reveal over about 7 seconds; computation is faster. Change battery price and retrain. “Finish reveal” skips the animation.
+- Fuse: ask for a prediction, scan, then reveal the ground truth. The demo uses seed 3105, separate from the shared challenge. The Evidence lab shows raw signals, log-odds contributions and the actual fusion function.
+- Decide: use the Live code lab to execute individual training actions and inspect each Q update. Focus lab puts the update and its source code side by side on a desktop. Train Rove runs 8,000 site episodes from a blank table; Next checkpoint reveals one of eight recorded evaluations, and Show final policy completes the reveal. Changing battery price requires pressing Train Rove before the policy changes.
 - Inside: inspect the learned action table and results across 300 evaluation missions.
 - Fight: copy the participant link, start the local three-minute timer, and enter liters from Zoom chat. Names are optional. Undo reverses the last entry; clear rehearsal removes scores on this device. Reveal Rove and inspect its full replay.
-- Break: start the shared sensor bias, compare results, and retrain in the storm.
+- Break: start the shared sensor bias, compare results, and retrain in the storm. Test a known-bias repair subtracts the exact offset and measures the original policy on the corrected observations; knowing that offset is an explicit experimental assumption.
+
+The complete timed facilitator script is at `script.html`, with an editable copy at `workshop-script.md`. It includes expected answers, two numerical Q updates, activity timing, technical limits and fallback delivery options. Rebuild the HTML after editing the Markdown with `node scripts/build-script.mjs`.
 
 Participant controls: S = scan, D = drill, M = move. Touch controls stay visible on phones. Progress is stored locally in the participant browser. Presenter scores are local to the presenter browser; there is no synchronized live leaderboard. Anyone able to access the site can open the presenter tab, so the sealed result is for the workshop reveal, not a security barrier.
 
-## Verified results (simulator version 1)
+## Verified results
 
 All figures are computed by `dist/engine.mjs`. The original workshop narrative's unverified numbers are not hardcoded into charts.
 
@@ -29,7 +31,11 @@ Rove visits 19 sites, finds 5 water sites, makes no dry holes, and uses 11 extra
 
 Across 300 other missions, Rove averages 325 L in clear skies, 218 L under the unmodeled storm, and 329 L after retraining in the storm. Corresponding dry-hole means are 0.73, 6.17, and 2.35. Retraining does not repair probability calibration.
 
+Subtracting the exact known storm offset restores the original observations and reproduces all clear-sky baseline metrics across those 300 missions. The step-through and full training paths use the same `trainingSteps` generator and `updateValue` function, and tests verify identical learned tables.
+
 ## Model
+
+This is a synthetic teaching simulator. Signals are dimensionless, battery is an action budget, and liters are a fictional resource score. It does not model liquid-water extraction, actual instrument physics, rover dynamics, communications or terrain-dependent travel. The mission briefing and facilitator script explain these boundaries and link NASA's instrument documentation.
 
 Sites are wet with probability 0.3. Wet sites contain independent uniform integer volumes from 40 to 120 L. Signals have mean +1 for wet and −1 for dry, plus independent Gaussian noise with standard deviations 1.56, 2.34, and 3.51. Bayesian odds update with every reading. Rounded inverse-variance weights are 61%, 27%, 12%.
 
@@ -47,6 +53,8 @@ Run `node tests/simulator.mjs` for deterministic missions, resource accounting, 
 
 Run `node tests/edge-cases.mjs` for posterior behavior, rejected-action state preservation, scan-limit reset, 100 mixed-action missions, finite learned values at three battery prices, and storm ground-truth preservation.
 
+Run `node tests/learning.mjs` for step/batch equivalence, terminal and bootstrapped Q targets, corrected probabilities, corrected policy evaluation and the numeric values displayed in the learning lab.
+
 The site optionally exposes WebMCP read/action tools when supported. They use the same state and validation as the interface. The terrain is original generated artwork. Fonts load from Google Fonts with local system fallbacks. Gameplay has no external API dependency.
 
-Deploy the `dist` directory with a static hosting provider. Confirm attendee access before distributing the workshop link.
+The existing public site is https://fusedecidefight.com. Hosting is registered in `.openai/hosting.json`; preserve its public attendee access when publishing updates.
