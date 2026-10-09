@@ -25,6 +25,8 @@ This is your rehearsal and delivery guide. Quoted paragraphs are words you can s
 
 ## Before people arrive
 
+- Wait until the 3D scene says “Ready for your command.” Use Orbit for the full rover and Tool for a close look at the sampling arm. Drag to change your viewing angle. Scan sweeps the mast; Drill deploys the arm to the target, stows it, then traverses; Move turns the wheels and advances the surface. These are accelerated teaching visuals using NASA/JPL’s rover model, with a synthetic terrain and task.
+- Keep Motion on for your opening demo. Participants may use Skip animation or Motion off; these change presentation only and preserve exactly the same action costs and results. The mission also works with a still rover preview on devices without 3D support.
 - Open the presenter console in the browser you will share. Keep this script in a separate window or on another device. Share the console window in Zoom so your notes stay available to you.
 - Reload the console for a clean rehearsal state. Clear any rehearsal scores in Fight. Reset the live code lab. Leave the battery price at 0.45. Start on Fuse, demo site 01, one scan, truth hidden.
 - Keep one separate participant tab ready in practice mode. Do not demonstrate the shared mission before the competition; the Fuse demo now uses a different seed.

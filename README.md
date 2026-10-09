@@ -4,6 +4,7 @@ Interactive synthetic Mars workshop for Denisa Cakoni.
 
 ## Run the workshop
 
+- The participant mission includes an interactive 3D NASA/JPL Perseverance rover with mast scanning, arm deployment to a sampling target, wheel motion, dust and Mars terrain. Four camera views, drag-to-orbit, reduced-motion support, animation skipping and a still-image fallback are included. Motion is illustrative, accelerated and independent of engine randomness. See `dist/assets/CREDITS.md` for sources and limits.
 - Open `#play` for participants. The shared challenge is MSN-2047. Practice is a separate map.
 - Open `#console` for the presenter. Use the five stage buttons or left/right arrows.
 - Fuse: ask for a prediction, scan, then reveal the ground truth. The demo uses seed 3105, separate from the shared challenge. The Evidence lab shows raw signals, log-odds contributions and the actual fusion function.
@@ -12,7 +13,7 @@ Interactive synthetic Mars workshop for Denisa Cakoni.
 - Fight: copy the participant link, start the local three-minute timer, and enter liters from Zoom chat. Names are optional. Undo reverses the last entry; clear rehearsal removes scores on this device. Reveal Rove and inspect its full replay.
 - Break: start the shared sensor bias, compare results, and retrain in the storm. Test a known-bias repair subtracts the exact offset and measures the original policy on the corrected observations; knowing that offset is an explicit experimental assumption.
 
-The complete timed facilitator script is at `script.html`, with an editable copy at `workshop-script.md`. It includes expected answers, two numerical Q updates, activity timing, technical limits and fallback delivery options. Rebuild the HTML after editing the Markdown with `node scripts/build-script.mjs`.
+The complete timed facilitator script is kept outside the public `dist/` folder in `private/` for now. Rebuild the private HTML after editing the Markdown with `node scripts/build-script.mjs`; it is not served by the participant domain. The presenter console is also behind its private access code.
 
 Participant controls: S = scan, D = drill, M = move. Touch controls stay visible on phones. Progress is stored locally in the participant browser. Presenter scores are local to the presenter browser; there is no synchronized live leaderboard. Anyone able to access the site can open the presenter tab, so the sealed result is for the workshop reveal, not a security barrier.
 

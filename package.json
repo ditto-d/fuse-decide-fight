@@ -1,0 +1,10 @@
+{
+  "name": "fuse-decide-fight",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "assets": "node scripts/vendor-three.mjs",
+    "test": "node tests/simulator.mjs && node tests/edge-cases.mjs && node tests/learning.mjs && node tests/scene-timeline.mjs"
+  },
+  "dependencies": {"three": "0.186.1"}
+}
